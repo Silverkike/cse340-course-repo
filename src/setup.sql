@@ -120,3 +120,61 @@ VALUES
  'Community volunteer event during the holidays.',
  'San Salvador',
  '2026-12-05');
+
+ -- ========================================
+-- Categories Table
+-- ========================================
+
+CREATE TABLE categories (
+    category_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL
+);
+
+-- ========================================
+-- Project Categories Junction Table
+-- ========================================
+
+CREATE TABLE project_categories (
+    project_id INTEGER NOT NULL,
+    category_id INTEGER NOT NULL,
+
+    PRIMARY KEY (project_id, category_id),
+
+    FOREIGN KEY (project_id)
+        REFERENCES service_projects(project_id),
+
+    FOREIGN KEY (category_id)
+        REFERENCES categories(category_id)
+);
+
+-- ========================================
+-- Insert sample data: Categories
+-- ========================================
+
+INSERT INTO categories (name)
+VALUES
+('Education'),
+('Environment'),
+('Food Assistance');
+
+-- ========================================
+-- Associate Projects with Categories
+-- ========================================
+
+INSERT INTO project_categories (project_id, category_id)
+VALUES
+(1, 1),
+(2, 2),
+(3, 1),
+(4, 1),
+(5, 1),
+(6, 2),
+(7, 2),
+(8, 1),
+(9, 2),
+(10, 2),
+(11, 3),
+(12, 3),
+(13, 2),
+(14, 1),
+(15, 3);
