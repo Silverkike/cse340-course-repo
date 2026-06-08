@@ -15,6 +15,12 @@ const PORT = process.env.PORT || 3000;
 // Load the session secret from environment variables
 const SESSION_SECRET = process.env.SESSION_SECRET;
 
+if (!SESSION_SECRET) {
+    console.error('ERROR: SESSION_SECRET environment variable is not set!');
+    console.error('Please set SESSION_SECRET in your environment variables.');
+    process.exit(1); // Detiene el servidor si no hay secret
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
