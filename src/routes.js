@@ -30,6 +30,15 @@ import {
     processEditCategoryForm,
     categoryValidation
 } from './controllers/categories.js';
+
+// ========================================
+// 🆕 IMPORTACIÓN NUEVA: Controlador de Usuarios
+// ========================================
+import {
+    showUserRegistrationForm,
+    processUserRegistrationForm
+} from './controllers/users.js';
+
 import { testErrorPage } from './controllers/errors.js';
 
 const router = express.Router();
@@ -78,13 +87,22 @@ router.post('/edit-project/:id', projectValidation, processEditProjectForm);
 // Route to display the edit organization form
 router.get('/edit-organization/:id', showEditOrganizationForm);
 
-
 // Handle form submission for creating a new organization
 // organizationValidation acts as a security guard that checks data before it reaches the controller
 router.post('/new-organization', organizationValidation, processNewOrganizationForm);
 
 // Route to handle the edit organization form submission
 router.post('/edit-organization/:id', organizationValidation, processEditOrganizationForm);
+
+// ========================================
+// 🆕 RUTAS NUEVAS: Registro de Usuarios
+// ========================================
+
+// When user visits /register in browser (GET) - Show the registration form
+router.get('/register', showUserRegistrationForm);
+
+// When user submits the registration form (POST) - Process the registration
+router.post('/register', processUserRegistrationForm);
 
 // error-handling routes
 router.get('/test-error', testErrorPage);

@@ -17,17 +17,22 @@
             <li><a href="/organizations">Organizations</a></li>
             <li><a href="/categories">Categories</a></li>
             <li><a href="/projects">Projects</a></li>
+
+            <!-- ======================================== -->
+            <!-- 🆕 CAMBIO NUEVO: Enlace a la página de Registro -->
+            <!-- ======================================== -->
+            <li><a href="/register">Register</a></li>
         </ul>
     </nav>
 
-        <!-- Flash Messages Container 📝✨ -->
-        <% const messages=flash(); %>
-            <% Object.keys(messages).forEach(type=> { %>
-                <% if (messages[type].length> 0) { %>
-                    <div class="alert <%= type %>">
-                        <% messages[type].forEach(msg=> { %>
-                            <%= msg %>
-                                <% }); %>
-                    </div>
-                    <% } %>
-                        <% }); %>
+    <!-- Flash Messages Container 📝✨ -->
+    <% const messages=flash(); %>
+        <% Object.keys(messages).forEach(type=> { %>
+            <% if (messages[type].length> 0) { %>
+                <div class="alert <%= type %>">
+                    <% messages[type].forEach(msg=> { %>
+                        <%= msg %>
+                            <% }); %>
+                </div>
+                <% } %>
+                    <% }); %>
