@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 
 // ========================================
-// 🆕 IMPORTACIÓN ACTUALIZADA: Agregamos authenticateUser
+// IMPORTACIÓN ACTUALIZADA: Agregamos authenticateUser
 // ========================================
 import { createUser, authenticateUser } from '../models/users.js';
 
@@ -40,7 +40,7 @@ const processUserRegistrationForm = async (req, res) => {
 };
 
 // ========================================
-// 🆕 FUNCIONES NUEVAS PARA LOGIN/LOGOUT
+// FUNCIONES PARA LOGIN/LOGOUT
 // ========================================
 
 /**
@@ -71,8 +71,8 @@ const processLoginForm = async (req, res) => {
                 console.log('User logged in:', user);
             }
 
-            // 5. Redirigir al home
-            res.redirect('/');
+            // 5. Redirigir al dashboard
+            res.redirect('/dashboard');
         } else {
             // 6. Login fallido: credenciales inválidas
             req.flash('error', 'Invalid email or password.');
@@ -103,6 +103,51 @@ const processLogout = async (req, res) => {
 };
 
 // ========================================
+// MIDDLEWARE DE PROTECCIÓN DE RUTAS
+// ========================================
+
+/**
+ * Middleware que verifica si el usuario está logueado
+ * Se usa para proteger rutas que requieren autenticación
+ * @param {Object} req - Request object
+ * @param {Object} res - Response object
+ * @param {Function} next - Next middleware function
+ */
+const requireLogin = (req, res, next) => {
+    // Verificar si existe la sesión y si hay un usuario logueado
+    if (!req.session || !req.session.user) {
+        // ❌ NO está logueado → Crear mensaje de error y redirigir a login
+        req.flash('error', 'You must be logged in to access that page.');
+        return res.redirect('/login');
+    }
+
+    // ✅ SÍ está logueado → Continuar al siguiente middleware/controlador
+    next();
+};
+
+// ========================================
+// 🆕 CONTROLADOR DEL DASHBOARD
+// ========================================
+
+/**
+ * Muestra el dashboard del usuario con su información personalizada
+ * Esta ruta está protegida por el middleware requireLogin
+ * @param {Object} req - Request object (contiene req.session.user)
+ * @param {Object} res - Response object
+ */
+const showDashboard = (req, res) => {
+    // 1. Obtener el usuario de la sesión
+    const user = req.session.user;
+
+    // 2. Renderizar la vista del dashboard pasando los datos del usuario
+    res.render('dashboard', {
+        title: 'Dashboard',
+        name: user.name,
+        email: user.email
+    });
+};
+
+// ========================================
 // EXPORTS: Exportamos todas las funciones que las rutas necesitan
 // ========================================
 export {
@@ -110,5 +155,7 @@ export {
     processUserRegistrationForm,
     showLoginForm,
     processLoginForm,
-    processLogout
+    processLogout,
+    requireLogin,
+    showDashboard  // 🆕 Exportamos el controlador del dashboard
 };

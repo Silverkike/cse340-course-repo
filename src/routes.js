@@ -32,14 +32,16 @@ import {
 } from './controllers/categories.js';
 
 // ========================================
-// 🆕 IMPORTACIÓN ACTUALIZADA: Controlador de Usuarios (Registro + Login/Logout)
+// 🆕 IMPORTACIÓN ACTUALIZADA: Controlador de Usuarios (Registro + Login/Logout + Dashboard)
 // ========================================
 import {
     showUserRegistrationForm,
     processUserRegistrationForm,
     showLoginForm,
     processLoginForm,
-    processLogout
+    processLogout,
+    requireLogin,
+    showDashboard
 } from './controllers/users.js';
 
 import { testErrorPage } from './controllers/errors.js';
@@ -108,7 +110,7 @@ router.get('/register', showUserRegistrationForm);
 router.post('/register', processUserRegistrationForm);
 
 // ========================================
-// 🆕 RUTAS NUEVAS: Login/Logout de Usuarios
+// RUTAS: Login/Logout de Usuarios
 // ========================================
 
 // When user visits /login in browser (GET) - Show the login form
@@ -119,6 +121,13 @@ router.post('/login', processLoginForm);
 
 // When user clicks logout (GET) - Destroy session and redirect to login
 router.get('/logout', processLogout);
+
+// ========================================
+// 🆕 RUTAS PROTEGIDAS: Dashboard (requiere autenticación)
+// ========================================
+
+// Protected dashboard route - requireLogin middleware checks authentication before showDashboard
+router.get('/dashboard', requireLogin, showDashboard);
 
 // error-handling routes
 router.get('/test-error', testErrorPage);
