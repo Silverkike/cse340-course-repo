@@ -32,11 +32,14 @@ import {
 } from './controllers/categories.js';
 
 // ========================================
-// 🆕 IMPORTACIÓN NUEVA: Controlador de Usuarios
+// 🆕 IMPORTACIÓN ACTUALIZADA: Controlador de Usuarios (Registro + Login/Logout)
 // ========================================
 import {
     showUserRegistrationForm,
-    processUserRegistrationForm
+    processUserRegistrationForm,
+    showLoginForm,
+    processLoginForm,
+    processLogout
 } from './controllers/users.js';
 
 import { testErrorPage } from './controllers/errors.js';
@@ -95,7 +98,7 @@ router.post('/new-organization', organizationValidation, processNewOrganizationF
 router.post('/edit-organization/:id', organizationValidation, processEditOrganizationForm);
 
 // ========================================
-// 🆕 RUTAS NUEVAS: Registro de Usuarios
+// RUTAS: Registro de Usuarios
 // ========================================
 
 // When user visits /register in browser (GET) - Show the registration form
@@ -103,6 +106,19 @@ router.get('/register', showUserRegistrationForm);
 
 // When user submits the registration form (POST) - Process the registration
 router.post('/register', processUserRegistrationForm);
+
+// ========================================
+// 🆕 RUTAS NUEVAS: Login/Logout de Usuarios
+// ========================================
+
+// When user visits /login in browser (GET) - Show the login form
+router.get('/login', showLoginForm);
+
+// When user submits the login form (POST) - Process the login
+router.post('/login', processLoginForm);
+
+// When user clicks logout (GET) - Destroy session and redirect to login
+router.get('/logout', processLogout);
 
 // error-handling routes
 router.get('/test-error', testErrorPage);

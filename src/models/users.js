@@ -1,5 +1,10 @@
 import db from './db.js';
 
+// ========================================
+// 🆕 IMPORTACIÓN NUEVA: bcrypt para verificar contraseñas
+// ========================================
+import bcrypt from 'bcrypt';
+
 /**
  * Crea un nuevo usuario en la base de datos
  * @param {string} name - Nombre del usuario
@@ -44,4 +49,73 @@ const createUser = async (name, email, passwordHash) => {
     }
 };
 
-export { createUser };
+// ========================================
+// 🆕 FUNCIONES NUEVAS PARA LOGIN
+// ========================================
+
+/**
+ * Busca un usuario en la base de datos por su email
+ * @param {string} email - Email del usuario a buscar
+ * @returns {Promise<Object|null>} - El objeto usuario completo (incluye password_hash) o null si no existe
+ */
+const findUserByEmail = async (email) => {
+    const query = `
+        SELECT user_id, name, email, password_hash, role_id 
+        FROM users 
+        WHERE email = $1
+    `;
+    const queryParams = [email];
+
+    const result = await db.query(query, queryParams);
+
+    if (result.rows.length === 0) {
+        return null; // User not found
+    }
+
+    return result.rows[0];
+};
+
+/**
+ * Verifica si una contraseña en texto plano coincide con un hash almacenado
+ * @param {string} password - Contraseña en texto plano (la que el usuario ingresó)
+ * @param {string} passwordHash - Hash almacenado en la base de datos
+ * @returns {Promise<boolean>} - true si coinciden, false si no
+ */
+const verifyPassword = async (password, passwordHash) => {
+    return bcrypt.compare(password, passwordHash);
+};
+
+/**
+ * Autentica a un usuario verificando email y contraseña
+ * @param {string} email - Email del usuario
+ * @param {string} password - Contraseña en texto plano
+ * @returns {Promise<Object|null>} - El objeto usuario (sin password_hash) si es válido, o null si falla
+ */
+const authenticateUser = async (email, password) => {
+    // Paso 1: Buscar el usuario por email
+    const user = await findUserByEmail(email);
+
+    // Si no se encontró el usuario, retornar null
+    if (!user) {
+        return null;
+    }
+
+    // Paso 2: Verificar la contraseña
+    const isPasswordValid = await verifyPassword(password, user.password_hash);
+
+    // Si la contraseña no es válida, retornar null
+    if (!isPasswordValid) {
+        return null;
+    }
+
+    // Paso 3: Si todo es correcto, eliminar el password_hash antes de retornar
+    // (por seguridad, no queremos enviar el hash al controlador/sesión)
+    const { password_hash, ...userWithoutPassword } = user;
+
+    return userWithoutPassword;
+};
+
+// ========================================
+// EXPORTS: Solo exportamos lo que el controlador necesita
+// ========================================
+export { createUser, authenticateUser };

@@ -1,5 +1,9 @@
 import bcrypt from 'bcrypt';
-import { createUser } from '../models/users.js';
+
+// ========================================
+// 🆕 IMPORTACIÓN ACTUALIZADA: Agregamos authenticateUser
+// ========================================
+import { createUser, authenticateUser } from '../models/users.js';
 
 /**
  * Muestra el formulario de registro
@@ -35,4 +39,76 @@ const processUserRegistrationForm = async (req, res) => {
     }
 };
 
-export { showUserRegistrationForm, processUserRegistrationForm };
+// ========================================
+// 🆕 FUNCIONES NUEVAS PARA LOGIN/LOGOUT
+// ========================================
+
+/**
+ * Muestra el formulario de login
+ */
+const showLoginForm = (req, res) => {
+    res.render('login', { title: 'Login' });
+};
+
+/**
+ * Procesa el formulario de login, verifica credenciales y crea sesión
+ */
+const processLoginForm = async (req, res) => {
+    // 1. Extraer email y password del formulario
+    const { email, password } = req.body;
+
+    try {
+        // 2. Autenticar al usuario usando el modelo
+        const user = await authenticateUser(email, password);
+
+        if (user) {
+            // 3. Login exitoso: guardar usuario en la sesión
+            req.session.user = user;
+            req.flash('success', 'Login successful!');
+
+            // 4. Log para debugging (solo en desarrollo)
+            if (process.env.NODE_ENV === 'development') {
+                console.log('User logged in:', user);
+            }
+
+            // 5. Redirigir al home
+            res.redirect('/');
+        } else {
+            // 6. Login fallido: credenciales inválidas
+            req.flash('error', 'Invalid email or password.');
+            res.redirect('/login');
+        }
+    } catch (error) {
+        // 7. Manejo de errores inesperados
+        console.error('Error during login:', error);
+        req.flash('error', 'An error occurred during login. Please try again.');
+        res.redirect('/login');
+    }
+};
+
+/**
+ * Procesa el logout: destruye la sesión y redirige al login
+ */
+const processLogout = async (req, res) => {
+    // 1. Eliminar el usuario de la sesión (si existe)
+    if (req.session.user) {
+        delete req.session.user;
+    }
+
+    // 2. Mensaje de éxito
+    req.flash('success', 'Logout successful!');
+
+    // 3. Redirigir al login
+    res.redirect('/login');
+};
+
+// ========================================
+// EXPORTS: Exportamos todas las funciones que las rutas necesitan
+// ========================================
+export {
+    showUserRegistrationForm,
+    processUserRegistrationForm,
+    showLoginForm,
+    processLoginForm,
+    processLogout
+};

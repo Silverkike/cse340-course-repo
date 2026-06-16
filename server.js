@@ -62,8 +62,18 @@ app.use((req, res, next) => {
     next();
 });
 
-// Middleware to make NODE_ENV available to all templates
+// ========================================
+// 🆕 MIDDLEWARE ACTUALIZADO: Variables globales para todas las vistas
+// ========================================
+// Middleware to make NODE_ENV and isLoggedIn available to all templates
 app.use((req, res, next) => {
+    // Establecer el estado de login (El letrero luminoso 🟢🔴)
+    res.locals.isLoggedIn = false;
+    if (req.session && req.session.user) {
+        res.locals.isLoggedIn = true;
+    }
+
+    // Establecer el entorno de la aplicación
     res.locals.NODE_ENV = NODE_ENV;
     next();
 });
