@@ -120,6 +120,37 @@ const authenticateUser = async (email, password) => {
 };
 
 // ========================================
+// FUNCIONES PARA GESTIÓN DE USUARIOS
+// ========================================
+
+/**
+ * Recupera todos los usuarios con su rol
+ * @returns {Promise<Array<Object>>} - Array de usuarios: { user_id, name, email, role_name }
+ */
+const getAllUsers = async () => {
+    const query = `
+        SELECT u.user_id, u.name, u.email, r.role_name
+        FROM users u
+        JOIN roles r ON u.role_id = r.role_id
+        ORDER BY u.user_id ASC
+    `;
+
+    try {
+        const result = await db.query(query, []); // parámetro vacío por seguridad
+
+        if (process.env.ENABLE_SQL_LOGGING === 'true') {
+            console.log('Executed SQL for getAllUsers');
+        }
+
+        // Asegurarnos de retornar un array (vacío si no hay usuarios)
+        return result.rows || [];
+    } catch (error) {
+        console.error('Error in getAllUsers:', error);
+        throw error;
+    }
+};
+
+// ========================================
 // EXPORTS: Solo exportamos lo que el controlador necesita
 // ========================================
-export { createUser, authenticateUser };
+export { createUser, authenticateUser, getAllUsers };

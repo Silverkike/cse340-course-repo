@@ -41,8 +41,9 @@ import {
     processLoginForm,
     processLogout,
     requireLogin,
-    requireRole,  // 🆕 Importamos el middleware factory de roles
-    showDashboard
+    requireRole,
+    showDashboard,
+    showUsersPage  // 🆕 Importamos el controlador de lista de usuarios
 } from './controllers/users.js';
 
 import { testErrorPage } from './controllers/errors.js';
@@ -146,6 +147,13 @@ router.get('/logout', processLogout);
 
 // Protected dashboard route - requireLogin middleware checks authentication before showDashboard
 router.get('/dashboard', requireLogin, showDashboard);
+
+// ========================================
+// 🔒 RUTAS PROTEGIDAS: Gestión de Usuarios (solo admin)
+// ========================================
+
+// Protected users list route - only accessible by admin users
+router.get('/users', requireRole('admin'), showUsersPage);
 
 // error-handling routes
 router.get('/test-error', testErrorPage);

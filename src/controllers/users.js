@@ -1,9 +1,9 @@
 import bcrypt from 'bcrypt';
 
 // ========================================
-// IMPORTACIÓN ACTUALIZADA: Agregamos authenticateUser
+// IMPORTACIÓN ACTUALIZADA: Agregamos authenticateUser y getAllUsers
 // ========================================
-import { createUser, authenticateUser } from '../models/users.js';
+import { createUser, authenticateUser, getAllUsers } from '../models/users.js';
 
 /**
  * Muestra el formulario de registro
@@ -178,6 +178,33 @@ const showDashboard = (req, res) => {
 };
 
 // ========================================
+// CONTROLADOR PARA LISTA DE USUARIOS (ADMIN)
+// ========================================
+
+/**
+ * Muestra la página con la lista de todos los usuarios (solo admin)
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
+const showUsersPage = async (req, res) => {
+    try {
+        // Obtener todos los usuarios desde el modelo
+        const users = await getAllUsers();
+
+        // Renderizar la vista 'users' con el título y la lista de usuarios
+        res.render('users', {
+            title: 'Users',
+            users: users
+        });
+    } catch (error) {
+        // Loguear el error y notificar al usuario vía flash, luego redirigir
+        console.error('Error retrieving users:', error);
+        req.flash('error', 'An error occurred while retrieving users.');
+        res.redirect('/dashboard');
+    }
+};
+
+// ========================================
 // EXPORTS: Exportamos todas las funciones que las rutas necesitan
 // ========================================
 export {
@@ -188,5 +215,6 @@ export {
     processLogout,
     requireLogin,
     requireRole,  // 🆕 Exportamos el middleware factory de roles
-    showDashboard
+    showDashboard,
+    showUsersPage // 🆕 Exportamos el controlador de lista de usuarios
 };

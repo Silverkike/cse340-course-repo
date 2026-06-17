@@ -1,0 +1,53 @@
+<%- include('partials/header') %>
+
+    <!-- Users list page (admin-only) -->
+    <main>
+        <!-- Page title -->
+        <h1>
+            <%= title %>
+        </h1>
+
+        <!-- Description -->
+        <p>List of all registered users in the system.</p>
+
+        <!-- Users table or empty message -->
+        <% if (!users || users.length===0) { %>
+            <!-- No users found -->
+            <p>No users found in the system.</p>
+            <% } else { %>
+                <!-- Users table -->
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Role</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% users.forEach(user=> { %>
+                            <tr>
+                                <td>
+                                    <%= user.user_id %>
+                                </td>
+                                <td>
+                                    <%= user.name %>
+                                </td>
+                                <td>
+                                    <%= user.email %>
+                                </td>
+                                <td>
+                                    <%= user.role_name %>
+                                </td>
+                            </tr>
+                            <% }); %>
+                    </tbody>
+                </table>
+                <% } %>
+
+                    <!-- Back link -->
+                    <p><a href="/dashboard">Back to Dashboard</a></p>
+    </main>
+
+    <%- include('partials/footer') %>
