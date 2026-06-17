@@ -9,33 +9,37 @@
             <%= organizationDetails.name %>
         </h2>
 
-        <img src="/images/<%= organizationDetails.logo_filename %>" alt="<%= organizationDetails.name %> logo" width="150">
+        <img src="/images/<%= organizationDetails.logo_filename %>" alt="<%= organizationDetails.name %> logo"
+            width="150">
 
         <p>
             Description:
             <%= organizationDetails.description %>
         </p>
 
-        <p>
-            <a href="/edit-organization/<%= organizationDetails.organization_id %>">Edit Organization
+        <!-- ======================================== -->
+        <!-- 🆕 CAMBIO: Enlace solo visible para admins -->
+        <!-- ======================================== -->
+        <% if (user && user.role_name==='admin' ) { %>
+            <p>
+                <a href="/edit-organization/<%= organizationDetails.organization_id %>">Edit Organization</a>
+            </p>
+            <% } %>
 
-            </a>
-        </p>
+                <h3>Service Projects</h3>
 
-        <h3>Service Projects</h3>
+                <ul>
+                    <% projects.forEach(project=> { %>
 
-        <ul>
-            <% projects.forEach(project=> { %>
-        
-            <li>
-                <a href="/project/<%= project.project_id %>">
-                    <%= project.title %>
-                </a>
-            </li>
-        
-            <% }) %>
-        
-        </ul>
+                        <li>
+                            <a href="/project/<%= project.project_id %>">
+                                <%= project.title %>
+                            </a>
+                        </li>
+
+                        <% }) %>
+
+                </ul>
 
     </main>
 

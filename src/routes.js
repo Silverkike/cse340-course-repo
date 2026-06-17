@@ -32,7 +32,7 @@ import {
 } from './controllers/categories.js';
 
 // ========================================
-// 🆕 IMPORTACIÓN ACTUALIZADA: Controlador de Usuarios (Registro + Login/Logout + Dashboard)
+// 🆕 IMPORTACIÓN ACTUALIZADA: Controlador de Usuarios (Registro + Login/Logout + Dashboard + requireRole)
 // ========================================
 import {
     showUserRegistrationForm,
@@ -41,6 +41,7 @@ import {
     processLoginForm,
     processLogout,
     requireLogin,
+    requireRole,  // 🆕 Importamos el middleware factory de roles
     showDashboard
 } from './controllers/users.js';
 
@@ -48,56 +49,73 @@ import { testErrorPage } from './controllers/errors.js';
 
 const router = express.Router();
 
+// ========================================
+// RUTAS PÚBLICAS (accesibles para todos)
+// ========================================
 router.get('/', showHomePage);
 router.get('/organizations', showOrganizationsPage);
 router.get('/projects', showProjectsPage);
 router.get('/project/:id', showProjectDetailsPage);
 router.get('/categories', showCategoriesPage);
 router.get('/category/:id', showCategoryDetailsPage);
+router.get('/organization/:id', showOrganizationDetailsPage);
+
+// ========================================
+// 🔒 RUTAS PROTEGIDAS: Categorías (solo admin)
+// ========================================
 
 // Route for new category page
-router.get('/new-category', showNewCategoryForm);
+router.get('/new-category', requireRole('admin'), showNewCategoryForm);
 
 // Route to handle new category form submission
-// categoryValidation acts as a security guard that checks data before it reaches the controller
-router.post('/new-category', categoryValidation, processNewCategoryForm);
+// requireRole('admin') acts as security guard, categoryValidation checks data
+router.post('/new-category', requireRole('admin'), categoryValidation, processNewCategoryForm);
 
 // Route to display the edit category form
-router.get('/edit-category/:id', showEditCategoryForm);
+router.get('/edit-category/:id', requireRole('admin'), showEditCategoryForm);
 
 // Route to handle edit category form submission
-// categoryValidation acts as a security guard that checks data before it reaches the controller
-router.post('/edit-category/:id', categoryValidation, processEditCategoryForm);
+// requireRole('admin') acts as security guard, categoryValidation checks data
+router.post('/edit-category/:id', requireRole('admin'), categoryValidation, processEditCategoryForm);
 
 // Routes to handle the assign categories to project form
-router.get('/assign-categories/:projectId', showAssignCategoriesForm);
-router.post('/assign-categories/:projectId', processAssignCategoriesForm);
-router.get('/organization/:id', showOrganizationDetailsPage);
-router.get('/new-organization', showNewOrganizationForm);
+router.get('/assign-categories/:projectId', requireRole('admin'), showAssignCategoriesForm);
+router.post('/assign-categories/:projectId', requireRole('admin'), processAssignCategoriesForm);
 
-// Route for new project page
-router.get('/new-project', showNewProjectForm);
+// ========================================
+// 🔒 RUTAS PROTEGIDAS: Organizaciones (solo admin)
+// ========================================
 
-// Route to handle new project form submission
-// projectValidation acts as a security guard that checks data before it reaches the controller
-router.post('/new-project', projectValidation, processNewProjectForm);
-
-// Route to display the edit project form
-router.get('/edit-project/:id', showEditProjectForm);
-
-// Route to handle edit project form submission
-// projectValidation acts as a security guard that checks data before it reaches the controller
-router.post('/edit-project/:id', projectValidation, processEditProjectForm);
-
-// Route to display the edit organization form
-router.get('/edit-organization/:id', showEditOrganizationForm);
+// Route for new organization page
+router.get('/new-organization', requireRole('admin'), showNewOrganizationForm);
 
 // Handle form submission for creating a new organization
-// organizationValidation acts as a security guard that checks data before it reaches the controller
-router.post('/new-organization', organizationValidation, processNewOrganizationForm);
+// requireRole('admin') acts as security guard, organizationValidation checks data
+router.post('/new-organization', requireRole('admin'), organizationValidation, processNewOrganizationForm);
+
+// Route to display the edit organization form
+router.get('/edit-organization/:id', requireRole('admin'), showEditOrganizationForm);
 
 // Route to handle the edit organization form submission
-router.post('/edit-organization/:id', organizationValidation, processEditOrganizationForm);
+router.post('/edit-organization/:id', requireRole('admin'), organizationValidation, processEditOrganizationForm);
+
+// ========================================
+// 🔒 RUTAS PROTEGIDAS: Proyectos (solo admin)
+// ========================================
+
+// Route for new project page
+router.get('/new-project', requireRole('admin'), showNewProjectForm);
+
+// Route to handle new project form submission
+// requireRole('admin') acts as security guard, projectValidation checks data
+router.post('/new-project', requireRole('admin'), projectValidation, processNewProjectForm);
+
+// Route to display the edit project form
+router.get('/edit-project/:id', requireRole('admin'), showEditProjectForm);
+
+// Route to handle edit project form submission
+// requireRole('admin') acts as security guard, projectValidation checks data
+router.post('/edit-project/:id', requireRole('admin'), projectValidation, processEditProjectForm);
 
 // ========================================
 // RUTAS: Registro de Usuarios
@@ -123,7 +141,7 @@ router.post('/login', processLoginForm);
 router.get('/logout', processLogout);
 
 // ========================================
-// 🆕 RUTAS PROTEGIDAS: Dashboard (requiere autenticación)
+// RUTAS PROTEGIDAS: Dashboard (requiere autenticación)
 // ========================================
 
 // Protected dashboard route - requireLogin middleware checks authentication before showDashboard

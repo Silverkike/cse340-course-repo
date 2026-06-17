@@ -1,19 +1,26 @@
 <%- include('partials/header') %>
 
-    <h1>
-        <%= title %>
-    </h1>
+    <main>
+        <h1>
+            <%= title %>
+        </h1>
 
-    <ul>
-        <% categories.forEach(category=> { %>
-            <li>
-                <a href="/category/<%= category.category_id %>">
-                    <%= category.name %>
-                </a>
-            </li>
-            <% }) %>
-    </ul>
+        <ul>
+            <% categories.forEach(category=> { %>
+                <li>
+                    <a href="/category/<%= category.category_id %>">
+                        <%= category.name %>
+                    </a>
+                </li>
+                <% }) %>
+        </ul>
 
-    <p><a href="/new-category">Add New Category</a></p>
+        <!-- ======================================== -->
+        <!-- 🆕 CAMBIO: Enlace solo visible para admins -->
+        <!-- ======================================== -->
+        <% if (user && user.role_name==='admin' ) { %>
+            <p><a href="/new-category">Add New Category</a></p>
+            <% } %>
+    </main>
 
     <%- include('partials/footer') %>

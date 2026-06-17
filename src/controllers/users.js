@@ -126,7 +126,37 @@ const requireLogin = (req, res, next) => {
 };
 
 // ========================================
-// 🆕 CONTROLADOR DEL DASHBOARD
+// 🆕 MIDDLEWARE FACTORY: Verificación de Roles
+// ========================================
+
+/**
+ * Middleware factory para requerir un rol específico para acceder a una ruta
+ * Retorna un middleware que verifica si el usuario tiene el rol requerido
+ * 
+ * @param {string} role - El nombre del rol requerido (ej: 'admin', 'user')
+ * @returns {Function} Middleware de Express
+ */
+const requireRole = (role) => {
+    return (req, res, next) => {
+        // Paso 1: Verificar si el usuario está logueado
+        if (!req.session || !req.session.user) {
+            req.flash('error', 'You must be logged in to access this page.');
+            return res.redirect('/login');
+        }
+
+        // Paso 2: Verificar si el rol del usuario coincide con el rol requerido
+        if (req.session.user.role_name !== role) {
+            req.flash('error', 'You do not have permission to access this page.');
+            return res.redirect('/');
+        }
+
+        // Paso 3: El usuario tiene el rol requerido, continuar
+        next();
+    };
+};
+
+// ========================================
+// CONTROLADOR DEL DASHBOARD
 // ========================================
 
 /**
@@ -157,5 +187,6 @@ export {
     processLoginForm,
     processLogout,
     requireLogin,
-    showDashboard  // 🆕 Exportamos el controlador del dashboard
+    requireRole,  // 🆕 Exportamos el middleware factory de roles
+    showDashboard
 };

@@ -17,7 +17,12 @@
                 <% }) %>
         </ul>
 
-        <p><a href="/edit-category/<%= category.category_id %>">Edit Category</a></p>
+        <!-- ======================================== -->
+        <!-- 🆕 CAMBIO: Enlace solo visible para admins -->
+        <!-- ======================================== -->
+        <% if (user && user.role_name==='admin' ) { %>
+            <p><a href="/edit-category/<%= category.category_id %>">Edit Category</a></p>
+            <% } %>
     </main>
 
     <%- include('partials/footer') %>

@@ -1,7 +1,7 @@
 import db from './db.js';
 
 // ========================================
-// 🆕 IMPORTACIÓN NUEVA: bcrypt para verificar contraseñas
+// IMPORTACIÓN: bcrypt para verificar contraseñas
 // ========================================
 import bcrypt from 'bcrypt';
 
@@ -50,19 +50,23 @@ const createUser = async (name, email, passwordHash) => {
 };
 
 // ========================================
-// 🆕 FUNCIONES NUEVAS PARA LOGIN
+// FUNCIONES PARA LOGIN
 // ========================================
 
 /**
  * Busca un usuario en la base de datos por su email
  * @param {string} email - Email del usuario a buscar
- * @returns {Promise<Object|null>} - El objeto usuario completo (incluye password_hash) o null si no existe
+ * @returns {Promise<Object|null>} - El objeto usuario con role_name o null si no existe
  */
 const findUserByEmail = async (email) => {
+    // ========================================
+    // 🆕 CAMBIO: JOIN con roles para obtener role_name
+    // ========================================
     const query = `
-        SELECT user_id, name, email, password_hash, role_id 
-        FROM users 
-        WHERE email = $1
+        SELECT u.user_id, u.name, u.email, u.password_hash, r.role_name 
+        FROM users u
+        JOIN roles r ON u.role_id = r.role_id
+        WHERE u.email = $1
     `;
     const queryParams = [email];
 
