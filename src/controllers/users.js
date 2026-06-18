@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import { getUserVolunteerProjects } from '../models/projects.js';
 
 // ========================================
 // IMPORTACIÓN ACTUALIZADA: Agregamos authenticateUser y getAllUsers
@@ -64,6 +65,8 @@ const processLoginForm = async (req, res) => {
         if (user) {
             // 3. Login exitoso: guardar usuario en la sesión
             req.session.user = user;
+            console.log('Session user set:', req.session.user);
+            console.log('Session ID:', req.sessionID);
             req.flash('success', 'Login successful!');
 
             // 4. Log para debugging (solo en desarrollo)
@@ -73,6 +76,7 @@ const processLoginForm = async (req, res) => {
 
             // 5. Redirigir al dashboard
             res.redirect('/dashboard');
+            console.log('Redirecting to dashboard with session:', req.session);
         } else {
             // 6. Login fallido: credenciales inválidas
             req.flash('error', 'Invalid email or password.');
@@ -165,15 +169,25 @@ const requireRole = (role) => {
  * @param {Object} req - Request object (contiene req.session.user)
  * @param {Object} res - Response object
  */
-const showDashboard = (req, res) => {
+const showDashboard = async (req, res) => {
     // 1. Obtener el usuario de la sesión
     const user = req.session.user;
+    const userId = user.user_id;
+    let volunteerProjects = [];
 
-    // 2. Renderizar la vista del dashboard pasando los datos del usuario
+    try {
+        volunteerProjects = await getUserVolunteerProjects(userId);
+    } catch (error) {
+        console.error('Error fetching volunteer projects for dashboard:', error);
+        volunteerProjects = [];
+    }
+
+    // 2. Renderizar la vista del dashboard pasando los datos del usuario y sus proyectos de voluntariado
     res.render('dashboard', {
         title: 'Dashboard',
         name: user.name,
-        email: user.email
+        email: user.email,
+        volunteerProjects: volunteerProjects
     });
 };
 

@@ -71,6 +71,9 @@ app.use((req, res, next) => {
     res.locals.isLoggedIn = false;
     if (req.session && req.session.user) {
         res.locals.isLoggedIn = true;
+        console.log('Setting isLoggedIn to TRUE for user:', req.session.user.user_id);
+    } else {
+        console.log('Setting isLoggedIn to FALSE');
     }
 
     // 🆕 Establecer los datos del usuario para las vistas

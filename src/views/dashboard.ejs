@@ -1,5 +1,15 @@
 <%- include('partials/header') %>
 
+    <style>
+        .volunteer-project-card {
+            margin: 1rem 0;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+    </style>
+
     <main>
         <h1>
             <%= title %>
@@ -11,10 +21,39 @@
         <p>Username: <%= email %>
         </p>
 
-        <!-- Admin-only link to users management page -->
-        <% if (user && user.role_name==='admin' ) { %>
-            <p><a href="/users">View All Users (Admin)</a></p>
-            <% } %>
+        <!-- ======================================== -->
+        <!-- 🆕 My Volunteer Projects Section -->
+        <!-- ======================================== -->
+        <h2>My Volunteer Projects</h2>
+        <% if (!volunteerProjects || volunteerProjects.length===0) { %>
+            <p>You haven't volunteered for any projects yet. <a href="/projects">Browse projects</a>.</p>
+            <% } else { %>
+                <% volunteerProjects.forEach(project=> { %>
+                    <div class="volunteer-project-card">
+                        <h3><a href="/project/<%= project.project_id %>">
+                                <%= project.title %>
+                            </a></h3>
+                        <p><strong>Organization:</strong>
+                            <%= project.organization_name %>
+                        </p>
+                        <p><strong>Date:</strong>
+                            <%= new Date(project.date).toLocaleDateString('en-US', { year: 'numeric' , month: 'long' ,
+                                day: 'numeric' }) %>
+                        </p>
+                        <p><strong>Location:</strong>
+                            <%= project.location %>
+                        </p>
+                        <form method="POST" action="/project/<%= project.project_id %>/unvolunteer">
+                            <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                        </form>
+                    </div>
+                    <% }) %>
+                        <% } %>
+
+                            <!-- Admin-only link to users management page -->
+                            <% if (user && user.role_name==='admin' ) { %>
+                                <p><a href="/users">View All Users (Admin)</a></p>
+                                <% } %>
 
     </main>
 

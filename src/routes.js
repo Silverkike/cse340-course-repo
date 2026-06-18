@@ -17,7 +17,9 @@ import {
     processNewProjectForm,
     projectValidation,
     showEditProjectForm,
-    processEditProjectForm
+    processEditProjectForm,
+    addVolunteerToProject,
+    removeVolunteerFromProject
 } from './controllers/projects.js';
 import {
     showCategoriesPage,
@@ -154,6 +156,16 @@ router.get('/dashboard', requireLogin, showDashboard);
 
 // Protected users list route - only accessible by admin users
 router.get('/users', requireRole('admin'), showUsersPage);
+
+// ========================================
+// 🔒 RUTAS PROTEGIDAS: Voluntariado de Proyectos (requiere autenticación)
+// ========================================
+
+// Route to add current user as volunteer to a project
+router.post('/project/:id/volunteer', requireLogin, addVolunteerToProject);
+
+// Route to remove current user as volunteer from a project
+router.post('/project/:id/unvolunteer', requireLogin, removeVolunteerFromProject);
 
 // error-handling routes
 router.get('/test-error', testErrorPage);

@@ -1,4 +1,4 @@
-import db from './db.js'
+﻿import db from './db.js'
 
 const getAllProjects = async () => {
     const query = `
@@ -123,11 +123,64 @@ const updateProject = async (projectId, title, description, location, date, orga
     return result.rows[0].project_id;
 }
 
+const addVolunteer = async (projectId, userId) => {
+    const query = `
+        INSERT INTO public.project_volunteers (project_id, user_id)
+        VALUES ($1, $2);
+    `;
+    const queryParams = [projectId, userId];
+    const result = await db.query(query, queryParams);
+
+    if (process.env.ENABLE_SQL_LOGGING === 'true') {
+        console.log(`User ${userId} added as volunteer to project ${projectId}`);
+    }
+
+    return result;
+}
+
+const removeVolunteer = async (projectId, userId) => {
+    const query = `
+        DELETE FROM public.project_volunteers
+        WHERE project_id = $1 AND user_id = $2;
+    `;
+    const queryParams = [projectId, userId];
+    const result = await db.query(query, queryParams);
+
+    if (process.env.ENABLE_SQL_LOGGING === 'true') {
+        console.log(`User ${userId} removed as volunteer from project ${projectId}`);
+    }
+
+    return result;
+}
+
+const getUserVolunteerProjects = async (userId) => {
+    const query = `
+        SELECT 
+            sp.project_id,
+            sp.title,
+            sp.description,
+            sp.location,
+            sp.date,
+            o.name AS organization_name
+        FROM public.project_volunteers pv
+        JOIN public.service_projects sp ON pv.project_id = sp.project_id
+        JOIN public.organization o ON sp.organization_id = o.organization_id
+        WHERE pv.user_id = $1
+        ORDER BY sp.date;
+    `;
+    const queryParams = [userId];
+    const result = await db.query(query, queryParams);
+    return result.rows;
+}
+
 export {
     getAllProjects,
     getUpcomingProjects,
     getProjectDetails,
     getProjectsByOrganizationId,
     createProject,
-    updateProject
+    updateProject,
+    addVolunteer,
+    removeVolunteer,
+    getUserVolunteerProjects
 }

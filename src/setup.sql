@@ -82,6 +82,12 @@ CREATE TABLE public.project_categories (
     category_id integer NOT NULL
 );
 
+-- Tabla: project_volunteers (Junction Table for Volunteers)
+CREATE TABLE public.project_volunteers (
+    project_id integer NOT NULL,
+    user_id integer NOT NULL
+);
+
 -- Tabla: roles (Control de Acceso RBAC)
 CREATE TABLE public.roles (
     role_id integer NOT NULL,
@@ -125,6 +131,9 @@ ALTER TABLE ONLY public.categories
 ALTER TABLE ONLY public.project_categories
     ADD CONSTRAINT project_categories_pkey PRIMARY KEY (project_id, category_id);
 
+ALTER TABLE ONLY public.project_volunteers
+    ADD CONSTRAINT project_volunteers_pkey PRIMARY KEY (project_id, user_id);
+
 ALTER TABLE ONLY public.roles
     ADD CONSTRAINT roles_pkey PRIMARY KEY (role_id);
 
@@ -153,6 +162,12 @@ ALTER TABLE ONLY public.project_categories
 
 ALTER TABLE ONLY public.project_categories
     ADD CONSTRAINT project_categories_category_id_fkey FOREIGN KEY (category_id) REFERENCES public.categories(category_id);
+
+ALTER TABLE ONLY public.project_volunteers
+    ADD CONSTRAINT project_volunteers_project_id_fkey FOREIGN KEY (project_id) REFERENCES public.service_projects(project_id);
+
+ALTER TABLE ONLY public.project_volunteers
+    ADD CONSTRAINT project_volunteers_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id);
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_role_id_fkey FOREIGN KEY (role_id) REFERENCES public.roles(role_id);
